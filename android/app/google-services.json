@@ -1,0 +1,203 @@
+{
+  "project_info": {
+    "project_number": "164538397597",
+    "firebase_url": "https://afeer-2ea3a-default-rtdb.firebaseio.com",
+    "project_id": "afeer-2ea3a",
+    "storage_bucket": "afeer-2ea3a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164538397597:android:7916274ade863f070db574",
+        "android_client_info": {
+          "package_name": "afer.yoyo.com.afeer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoVF1Bc7RlkM-XwFHgx0WqBhkxmAth_qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "164538397597-2qruanj2hd9vv611d1ehknbb941jcodu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afeer.afeer.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164538397597:android:14492a261ddd85290db574",
+        "android_client_info": {
+          "package_name": "com.afeer.afeer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164538397597-gen4kbj3k2fqpc6uh40dp7rpf4q9s5mp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afeer.afeer",
+            "certificate_hash": "51fce11cf788db88e43969150511efeed2c5e763"
+          }
+        },
+        {
+          "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoVF1Bc7RlkM-XwFHgx0WqBhkxmAth_qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "164538397597-2qruanj2hd9vv611d1ehknbb941jcodu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afeer.afeer.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164538397597:android:2e15f5d8f4faeb560db574",
+        "android_client_info": {
+          "package_name": "com.example.afer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164538397597-aue9t3quqjbpgbill07u3gplqrfmj2du.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.afer",
+            "certificate_hash": "68008584627bb226ba7b18402699cd39d9cb1885"
+          }
+        },
+        {
+          "client_id": "164538397597-cig9k2955c1bf2fgdavjgg0623eta5up.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.afer",
+            "certificate_hash": "d650b9e8526cc207a85a3173b1978721565bccf6"
+          }
+        },
+        {
+          "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoVF1Bc7RlkM-XwFHgx0WqBhkxmAth_qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "164538397597-2qruanj2hd9vv611d1ehknbb941jcodu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afeer.afeer.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164538397597:android:28904bc30473d2200db574",
+        "android_client_info": {
+          "package_name": "wai.waidevloper.afer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "164538397597-83qtruieno6hc8968fj6or1rv86l2ofd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "wai.waidevloper.afer",
+            "certificate_hash": "d650b9e8526cc207a85a3173b1978721565bccf6"
+          }
+        },
+        {
+          "client_id": "164538397597-hhbjf4igvcdrqlamvlt8m1e0pdej1dnl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "wai.waidevloper.afer",
+            "certificate_hash": "2aef67bfbdcc8551b106b88381ec39cbf60bda6a"
+          }
+        },
+        {
+          "client_id": "164538397597-u69ggtl7e92v5th6p42cuiot397nnkb3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "wai.waidevloper.afer",
+            "certificate_hash": "68008584627bb226ba7b18402699cd39d9cb1885"
+          }
+        },
+        {
+          "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoVF1Bc7RlkM-XwFHgx0WqBhkxmAth_qA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "164538397597-c5k2d9fs6i281vpq5u5uvhv9codke9oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "164538397597-2qruanj2hd9vv611d1ehknbb941jcodu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afeer.afeer.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
