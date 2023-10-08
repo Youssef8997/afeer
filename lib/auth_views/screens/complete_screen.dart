@@ -1,13 +1,11 @@
 import 'package:afeer/models/user_model.dart';
 import 'package:afeer/utls/extension.dart';
-import 'package:afeer/utls/widget/base_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../utls/manger/assets_manger.dart';
 import '../../utls/manger/color_manger.dart';
 import '../../utls/manger/font_manger.dart';
 import '../../utls/widget/text_form.dart';
-import 'end_sign_up_screen.dart';
 
 class CompleteInfoScreen extends StatefulWidget {
   final String phone;
@@ -23,20 +21,33 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   late TextEditingController email;
   late TextEditingController phone;
   int team=1;
-  String type="كلية";
+  String type="Academic year";
+  String field="";
+  String types="كلية";
   String eg="مصري";
+  String university="";
   List teem=[
     "الفرقه الاولي",
     "الفرقه الثانيه",
   "الفرقه الثالثه",
     "الفرقه الرابعة"
   ];
+
   @override
   void initState() {
+    getData();
     name=TextEditingController();
     email=TextEditingController();
     phone=TextEditingController(text: widget.phone);
     super.initState();
+  }
+  void getData(){
+    setState(() {
+      field=context.appCuibt.home.fiends[0];
+      university=context.appCuibt.home.university[0];
+
+    });
+
   }
   @override
   void dispose() {
@@ -48,6 +59,7 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 50,
@@ -116,22 +128,34 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                   focusedErrorBorder: InputBorder.none,
                   filled: true,
                   fillColor: ColorsManger.white,
-                  label: Text(type)),
+                  label: Text(types)),
               items:[
                 DropdownMenuItem(
-                  value: "كلية",
+                  value: "Academic year",
                   child:Text("كلية",style: FontsManger.mediumFont(context)),
-
+onTap: (){
+                    setState(() {
+                      types="كلية";
+                    });
+},
                 ),
                 DropdownMenuItem(
-                  value: "معهد",
+                  value: "m3hd",
                   child:Text("معهد",style: FontsManger.mediumFont(context)),
-
+                  onTap: (){
+                    setState(() {
+                      types="معهد";
+                    });
+                  },
                 ),
                 DropdownMenuItem(
-                  value: "دبلوم",
+                  value: "diploma",
                   child:Text("دبلوم",style: FontsManger.mediumFont(context)),
-
+                  onTap: (){
+                    setState(() {
+                      types="دبلوم";
+                    });
+                  },
                 ),
 
               ],
@@ -144,11 +168,13 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
               },
             ),
           ),
-
+if(type=="Academic year")
           const SizedBox(
             height: 10,
           ),
-        Container(
+          if(type=="Academic year")
+
+            Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             width: context.width,
             height: 43,
@@ -167,42 +193,67 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                 focusedErrorBorder: InputBorder.none,
                 filled: true,
                 fillColor: ColorsManger.white,
-                label: Text(teem[team-1])),
-            items:[
-              DropdownMenuItem(
-                value: 1,
-                child:Text("الفرقه الاولي",style: FontsManger.mediumFont(context)),
+                label: Text(field)),
+            items:List.generate(context.appCuibt.home.fiends.length, (index) =>   DropdownMenuItem(
+              value: context.appCuibt.home.fiends[index],
+              child:Text(context.appCuibt.home.fiends[index],style: FontsManger.mediumFont(context)),
 
-              ),
-              DropdownMenuItem(
-                value: 2,
-                child:Text("الفرقه الثانيه",style: FontsManger.mediumFont(context)),
-
-              ),
-              DropdownMenuItem(
-                value: 3,
-                child:Text("الفرقه الثالثه",style: FontsManger.mediumFont(context)),
-
-              ),
-              DropdownMenuItem(
-                value: 4,
-                child:Text("الفرقه الرابعة",style: FontsManger.mediumFont(context)),
-
-              ),
-            ],
-            value: team,
-            onChanged: (int? value) {
+            ),),
+            value: field,
+            onChanged: ( value) {
               setState(() {
-                team = value!;
+                field = value.toString();
 
               });
             },
           ),
         ),
+          if(type=="Academic year")
+            const SizedBox(
+              height: 10,
+            ),
+          if(type=="Academic year")
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              width: context.width,
+              height: 43,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(width: 1,color: const Color(0xff707070))
+              ),
+              child: DropdownButtonFormField(
+                decoration:  InputDecoration(
+                    border: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    filled: true,
+                    fillColor: ColorsManger.white,
+                    label: Text(university)),
+                items:List.generate(context.appCuibt.home.university.length, (index) =>   DropdownMenuItem(
+                  value: context.appCuibt.home.university[index],
+                  child:Text(context.appCuibt.home.university[index],style: FontsManger.mediumFont(context)),
+
+                ),),
+                value: university,
+                onChanged: ( value) {
+                  setState(() {
+                    university = value.toString();
+
+                  });
+                },
+              ),
+            ),
+          if(type=="Academic year")
 
           const SizedBox(
             height: 10,
           ),
+          if(type=="Academic year")
 
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -315,7 +366,7 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
             height: 10,
           ),
           ElevatedButton(onPressed: (){
-            UserModel user=UserModel(name: email.text, image: "", phone: widget.phone, team: team.toString(), typeStudy: type, token: widget.token, university: "university", eg: eg=="مصري"?true:false);
+            UserModel user=UserModel(name: email.text, image: "", phone: widget.phone, team: team.toString(), typeStudy: type, token: widget.token, university: university, eg: eg=="مصري"?true:false,field: field);
             context.appCuibt.createAccount(user,context);
           }, child:Text("إستمرار",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: Colors.white),))
 

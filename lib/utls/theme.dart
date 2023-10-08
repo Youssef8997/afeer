@@ -11,14 +11,16 @@ ThemeData lightTheme() => ThemeData(
   scaffoldBackgroundColor: ColorsManger.scaffoldBackGround,
   useMaterial3: true,
   appBarTheme: const AppBarTheme(
+
     color: Colors.transparent,
     centerTitle: true,
     elevation: 0,
+
     systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: Color(0xffFCFCFE),
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.dark),
-    toolbarHeight: 30,
+    toolbarHeight: 0,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
 

@@ -1,9 +1,11 @@
 import 'package:afeer/auth_views/screens/sign_in_phone.dart';
+import 'package:afeer/home_view/home_layout.dart';
 import 'package:afeer/utls/extension.dart';
 import 'package:afeer/utls/manger/assets_manger.dart';
 import 'package:afeer/utls/manger/color_manger.dart';
 import 'package:afeer/utls/manger/font_manger.dart';
 import 'package:afeer/utls/widget/base_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -50,33 +52,67 @@ class _AuthHomeScreenState extends State<AuthHomeScreen> {
           const SizedBox(
             height: 40,
           ),
-          ElevatedButton.icon(
+        if (defaultTargetPlatform == TargetPlatform.android)
+
+      ElevatedButton.icon(
             
             style: Theme.of(context).elevatedButtonTheme.style?.copyWith(backgroundColor: const MaterialStatePropertyAll(Color(0xff181461))),
-              onPressed: () {context.appCuibt.signInWithGoogle(context);},
+              onPressed: () {
+                context.appCuibt.isVisitor=false;
+
+                context.appCuibt.signInWithGoogle(context);},
               icon: SvgPicture.asset(AssetsManger.googleIcon),
               label: Text("تسجيل الدخول باستخدام البريد الإلكتروني",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
-          const SizedBox(height: 10,),
-          Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),
-          const SizedBox(height: 10,),
-          ElevatedButton.icon(
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            const SizedBox(height: 10,),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            const SizedBox(height: 10,),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            ElevatedButton.icon(
 
               style: Theme.of(context).elevatedButtonTheme.style?.copyWith(backgroundColor: const MaterialStatePropertyAll(Color(0xff3A559F))),
-              onPressed: () {},
+              onPressed: () {
+                context.appCuibt.isVisitor=false;
+
+              },
               icon: SvgPicture.asset(AssetsManger.faceBookIcon),
               label: Text("تسجيل الدخول باستخدام الفيسبوك",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
-          const SizedBox(height: 10,),
-          Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),
-          const SizedBox(height: 10,),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            const SizedBox(height: 10,),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),
+          if (defaultTargetPlatform == TargetPlatform.android)
+
+            const SizedBox(height: 10,),
           ElevatedButton.icon(
 
               style: Theme.of(context).elevatedButtonTheme.style?.copyWith(backgroundColor: const MaterialStatePropertyAll(Color(0xff2AC052))),
               onPressed: () {
+                context.appCuibt.isVisitor=false;
+
                 navigatorWid(page: const SignInPhone(),context: context,returnPage: true);
               },
               icon: const Icon(Icons.phone,color: Colors.white),
               label: Text("تسجيل الدخول برقم الهاتف",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
+          const SizedBox(height: 10,),
 
+          Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),
+
+          const SizedBox(height: 10,),
+          ElevatedButton(
+              onPressed: () {
+                context.appCuibt.isVisitor=true;
+                navigatorWid(page: const HomeScreen(),context: context,returnPage: true);
+              },
+              child: Text("الدخول كزائر",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
         ],
       ),
     );

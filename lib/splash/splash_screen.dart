@@ -29,7 +29,6 @@ class _SplashScreenState extends State<SplashScreen> {
       timer=Timer.periodic(const Duration(seconds: 2), (timer) async {
         if(await SharedPreference.getDate(key: "token")!=null){
           navigatorWid(page: const HomeScreen(),context: context,returnPage: false);
-
         }else {
           navigatorWid(page: const OnBoardingScreen(),context: context,returnPage: false);
 
@@ -39,10 +38,13 @@ class _SplashScreenState extends State<SplashScreen> {
 }) ;   super.initState();
   }
   Future getData()async{
-   await  context.appCuibt.getHomeData();
-    if(await SharedPreference.getDate(key: "token")!=null){
-      await  context.appCuibt.getInfo(await SharedPreference.getDate(key: "token"));
-    }
+   await  context.appCuibt.getHomeData(context).then((value) async {
+
+     if(await SharedPreference.getDate(key: "token")!=null){
+     await  context.appCuibt.getInfo(await SharedPreference.getDate(key: "token"),context);
+     }
+   });
+
     return "hehe";
   }
   @override

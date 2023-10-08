@@ -1,4 +1,5 @@
 const String imagePath="assets/image";
+const int version=1;
 class AssetsManger{
   static String logo1="$imagePath/logo.svg";
   static String logo2="$imagePath/afeer.org.png";

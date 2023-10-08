@@ -45,7 +45,7 @@ int page=0;
       body: Column(
         children: [
           SizedBox(
-            height: context.height * .08,
+            height: context.height * .01,
           ),
           Image.asset(
             AssetsManger.logo2,

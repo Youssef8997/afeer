@@ -1,10 +1,13 @@
+import 'package:afeer/cuibt/app_cuibt.dart';
+import 'package:afeer/cuibt/app_state.dart';
 import 'package:afeer/utls/extension.dart';
-import 'package:afeer/utls/manger/font_manger.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../auth_views/screens/auth_home_screen.dart';
 import '../../chat_view/screens/chat_screen.dart';
 import '../../settings_views/screen/settings_screen.dart';
 import '../../utls/manger/assets_manger.dart';
@@ -19,6 +22,11 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
+  @override
+  void initState() {
+context.appCuibt.getPosts();
+super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +70,15 @@ class _NewsScreenState extends State<NewsScreen> {
                       const SizedBox(
                         width: 5,
                       ),
-                      InkWell(child: SvgPicture.asset("assets/image/Message---4.svg",width: 10,height: 30,fit: BoxFit.cover,),onTap: ()=>navigatorWid(page: const ChatScreen(),context: context,returnPage: true),),
+                      InkWell(child: SvgPicture.asset("assets/image/Message---4.svg",width: 10,height: 30,fit: BoxFit.cover,)
+                        ,
+                        onTap: () =>context.appCuibt.isVisitor?navigatorWid(
+                            page: const AuthHomeScreen(),
+                            context: context,
+                            returnPage: true): navigatorWid(
+                            page: const ChatScreen(),
+                            context: context,
+                            returnPage: true),                      ),
                     ],
                   ),
                 ),
@@ -79,168 +95,17 @@ class _NewsScreenState extends State<NewsScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Container(
-                  height: context.height * .13,
-                  width: context.width,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(.20),
-                            offset: const Offset(0, 1),
-                            blurRadius: 2)
-                      ]),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl:
-                                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                            width: 25,
-                            height: 25,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            height: 32,
-                            width: context.width * .76,
-                            alignment: Alignment.centerRight,
-                            decoration: BoxDecoration(
-                                color: const Color(0xffF0F2F5),
-                                borderRadius: BorderRadius.circular(20)),
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text("أكتب المنشور الذي تريد رفعه ",
-                                style: FontsManger.mediumFont(context)
-                                    ?.copyWith(
-                                        fontSize: 10,
-                                        color: const Color(0xff606770))),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Divider(
-                        color: Color(0xffE4E6EB),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          InkWell(
-                            onTap: () {},
-                            child: Row(
-                              children: [
-                                Text(
-                                  "إدراج مستند",
-                                  style: FontsManger.mediumFont(context)
-                                      ?.copyWith(
-                                          fontSize: 10,
-                                          color: const Color(0xff606770)),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                SvgPicture.asset("assets/image/paper.svg",
-                                    height: 20, width: 20),
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            child: Row(
-                              children: [
-                                Text(
-                                  "إدراج صورة",
-                                  style: FontsManger.mediumFont(context)
-                                      ?.copyWith(
-                                          fontSize: 10,
-                                          color: const Color(0xff606770)),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Image.asset("assets/image/gallery.png",
-                                    height: 20, width: 20),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  height: context.height * .06,
-                  width: context.width,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(.20),
-                            offset: const Offset(0, 1),
-                            blurRadius: 2)
-                      ]),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xffE4E6EB),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          height: 40,
-                          width: 60,
-                          child: Text.rich(TextSpan(children: [
-                            TextSpan(
-                                text: "فلترة",
-                                style: FontsManger.mediumFont(context)
-                                    ?.copyWith(
-                                        fontSize: 12,
-                                        color: const Color(0xff1D1F23))),
-                            WidgetSpan(
-                                child: SvgPicture.asset(
-                                    "assets/image/Image 17.svg")),
-                            const WidgetSpan(
-                                child: SizedBox(
-                              width: 5,
-                            )),
-                          ])),
-                        ),
-                      ),
-                      Text(
-                        "المنشورات",
-                        style: FontsManger.largeFont(context),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const PostWidget(),
-                const SizedBox(
-                  height: 20,
-                ),
-                const PostWidget(),
+            child: BlocBuilder<AppCubit,AppState>(
+              builder: (context,state) {
+                return Column(
+                  children: [
+   for(int i =0;i<context.appCuibt.posts.length;i++)
+     PostWidget(post: context.appCuibt.posts[i],)
 
-              ],
+
+                  ],
+                );
+              }
             ),
           )
         ],

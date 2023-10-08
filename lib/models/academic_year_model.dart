@@ -11,4 +11,10 @@ class AcademicYear{
     image: json["image"],
     year: json["year"],
   );
+  Map <String,dynamic>toMap()=>{
+    "name":name,
+    "type":type,
+    "image":image,
+    "year":year,
+  };
 }

@@ -32,7 +32,7 @@ class _TextFormWidgetState extends State<TextFormWidget> {
       width: context.width,
       height: 43,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:widget.filledColor?? Colors.white,
 borderRadius: BorderRadius.circular(8),
         border: Border.all(width: 1,color: const Color(0xff707070))
       ),
@@ -48,7 +48,7 @@ textAlignVertical: TextAlignVertical.center,
           suffixIcon:widget.suffix,
           hintText:widget.label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: widget.filledColor??Colors.white,
           alignLabelWithHint: true,
           hintStyle:FontsManger.mediumFont(context)?.copyWith(color: ColorsManger.text3.withOpacity(.20)),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: const BorderSide(width:1,color: Colors.transparent)),

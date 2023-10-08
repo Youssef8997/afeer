@@ -1,11 +1,13 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:afeer/splash/splash_screen.dart';
+import 'package:afeer/utls/notfi_handelr.dart';
 import 'package:afeer/utls/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 
 import 'cuibt/app_cuibt.dart';
 import 'data/local_data.dart';
@@ -13,10 +15,13 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreference.init();
+  await SharedPreference.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+   FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+
+   NotificationsHandler.init();
   runApp(const MyApp());
 }
 

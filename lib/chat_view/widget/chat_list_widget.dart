@@ -1,47 +1,83 @@
+
+import 'package:afeer/utls/extension.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../utls/manger/font_manger.dart';
+import '../../../models/user_model.dart';
+import '../../../utls/manger/font_manger.dart';
+import '../../models/chat_list_model.dart';
+import '../../utls/widget/base_widget.dart';
+import '../screens/massgae_personal_screen.dart';
 
 class ChatListWidget extends StatefulWidget {
-  const ChatListWidget({super.key});
+  final ChatListModel chatList;
+
+  const ChatListWidget({super.key, required this.chatList});
 
   @override
   State<ChatListWidget> createState() => _ChatListWidgetState();
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
+  UserModel? user;
+
+  void getUserInfo() async {
+    if(widget.chatList.idUser1!=context.appCuibt.user!.token){
+      user = await context.appCuibt.getInfoUser(widget.chatList.idUser1);
+
+    }else {
+      user = await context.appCuibt.getInfoUser(widget.chatList.idUser2);
+
+    }
+  }
+
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: ()=>user!=null?navigatorWid(page: PersonalChatScreen(chat: widget.chatList,user: user!,),context: context,returnPage: true):null,
       leading: Container(
         height: 60,
         width: 51,
-        padding: const EdgeInsets.symmetric(horizontal: 3,vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xff374AE0),width:2 )
-        ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xff374AE0), width: 2)),
         child: CachedNetworkImage(
           fit: BoxFit.fill,
           height: 54,
           width: 46,
-          imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzHQv_th9wq3ivQ1CVk7UZRxhbPq64oQrg5Q&usqp=CAU",
-          imageBuilder:(context,i)=> Container(
+          imageUrl: user?.image ?? "",
+          imageBuilder: (context, i) => Container(
             height: 54,
             width: 46,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-              image: DecorationImage(
-                image: i,
-                fit: BoxFit.fill
-              )
+                image: DecorationImage(image: i, fit: BoxFit.fill)),
+          ),
+          errorWidget: (context, i, _) => Container(
+            height: 54,
+            width: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
             ),
+            child: const Icon(Icons.person),
           ),
         ),
       ),
-      title: Text("يوسف احمد",style: FontsManger.largeFont(context)?.copyWith(fontSize: 15,color: const Color(0xff343434))),
-      subtitle: Text("المهم يا صديقي عاوزين نذاكر ونجتهد علشان مفيش وقت ولازم ننجز اللي ...",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 10,color:Colors.black.withOpacity(.7) ),maxLines: 1),
+      title: Text(user?.name ?? "",
+          style: FontsManger.largeFont(context)
+              ?.copyWith(fontSize: 15, color: const Color(0xff343434))),
+      subtitle: Text(widget.chatList.lastMassage,
+          style: FontsManger.mediumFont(context)
+              ?.copyWith(fontSize: 10, color: Colors.black.withOpacity(.7)),
+          maxLines: 1),
+
     );
   }
 }

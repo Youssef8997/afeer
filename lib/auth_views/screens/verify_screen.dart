@@ -1,11 +1,9 @@
 import 'package:afeer/utls/extension.dart';
-import 'package:afeer/utls/widget/base_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
 
 import '../../utls/manger/assets_manger.dart';
 import '../../utls/manger/font_manger.dart';
-import 'complete_screen.dart';
 
 class VerifyScreen extends StatefulWidget {
   final String phone;
@@ -24,8 +22,10 @@ otp=TextEditingController();
   }
   @override
   void dispose() {
-    otp.dispose();
-    super.dispose();
+  super.dispose();
+
+
+  otp.dispose();
   }
   @override
   Widget build(BuildContext context) {
