@@ -33,10 +33,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   YoutubePlayerController ? controller;
+Future<void> data() async {
+  String topic =
+      await context.appCuibt.translate("${context.appCuibt.user?.field}-${context.appCuibt.user?.university}-${context.appCuibt.user?.team}");
 
+  FirebaseMessaging.instance.subscribeToTopic(topic.replaceAll(" ", "-"));
+}
   @override
   void initState() {
+    data();
     FirebaseMessaging.instance.subscribeToTopic("all");
+
     if(context.appCuibt.isVisitor==false){
       if(context.appCuibt.user!.typeStudy=="Academic year") {
         context.appCuibt.getSubject();

@@ -43,7 +43,7 @@ class AppCubit extends Cubit<AppState> {
   static AppCubit get(context) => BlocProvider.of(context);
   late HomeModel home;
   CollageModel? collage;
-   UserModel? user;
+  UserModel? user;
   XFile? file;
   int pos = 0;
   List<AcademicYear> subjectList = [];
@@ -57,7 +57,8 @@ class AppCubit extends Cubit<AppState> {
   int correctAnswer = 0;
   List<PostsModel> posts = [];
   PageController pageController = PageController();
-  bool isVisitor=false;
+  bool isVisitor = false;
+
   void changePos(value) {
     pos = value;
     emit(ChangePos());
@@ -77,7 +78,8 @@ class AppCubit extends Cubit<AppState> {
       navigatorWid(
           page: const EndSignUpScreen(), returnPage: false, context: context);
       user = userNew;
-      String topic= await translate("${user?.field}-${user?.university}-${user?.team}");
+      String topic =
+          await translate("${user?.field}-${user?.university}-${user?.team}");
 
       FirebaseMessaging.instance.subscribeToTopic(topic.replaceAll(" ", "-"));
 
@@ -95,7 +97,8 @@ class AppCubit extends Cubit<AppState> {
           page: const HomeScreen(), returnPage: false, context: context);
 
       user = userNew;
-      String topic= await translate("${user?.field}-${user?.university}-${user?.team}");
+      String topic =
+          await translate("${user?.field}-${user?.university}-${user?.team}");
 
       FirebaseMessaging.instance.subscribeToTopic(topic.replaceAll(" ", "-"));
       SharedPreference.setDate(key: "token", value: userNew.token);
@@ -103,15 +106,21 @@ class AppCubit extends Cubit<AppState> {
   }
 
   Future<String> uploadProfilePhoto() {
-    return FirebaseStorage.instance
-        .ref()
-        .child('profilePhoto/${user?.token}')
-        .putFile(File(file!.path))
-        .then((value) {
-      return value.ref.getDownloadURL().then((value) {
-        return value;
+    if(file!=null){
+      return FirebaseStorage.instance
+          .ref()
+          .child('profilePhoto/${user?.token}')
+          .putFile(File(file!.path))
+
+          .then((value) {
+        return value.ref.getDownloadURL().then((value) {
+          return value;
+        });
       });
-    });
+    }else {
+      return Future(() => "");
+    }
+
   }
 
   Future pickerPhoto(context) async {
@@ -145,6 +154,7 @@ class AppCubit extends Cubit<AppState> {
       return value.data()!["profileUrl"];
     });
   }
+
   void signOut(context) {
     FirebaseAuth.instance.signOut().then((value) {
       navigatorWid(
