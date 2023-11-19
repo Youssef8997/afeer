@@ -6,6 +6,7 @@ class SubModel{
   final String price;
   final bool isASingleSubject;
   final List? singleSubject;
+  final int? countSub;
   final bool isAllAvailable;
   final List?notAvailable;
 
@@ -13,6 +14,7 @@ class SubModel{
       {required this.name,
         required this.det,
         this.singleSubject,
+        this.countSub,
         this.id,
         required this.price,
         required this.isASingleSubject,
@@ -22,20 +24,22 @@ class SubModel{
     name: json["name"],
     det: json["det"],
     price: json["price"],
+    countSub: json["countSub"],
     id: json["id"],
     isASingleSubject: json["isASingleSubject"],
     isAllAvailable: json["isAllAvailable"],
     notAvailable: json["notAvailable"],
     singleSubject: json["singleSubject"],
   );
-  Map<String,dynamic>toMap(id)=>{
+  Map<String,dynamic>toMap(id,subjects)=>{
     "name":name,
     "id":id,
     "det":det,
     "price":price,
+    "countSub":countSub,
     "isASingleSubject":isASingleSubject,
     "isAllAvailable":isAllAvailable,
     "notAvailable":notAvailable,
-    "singleSubject":singleSubject,
+    "singleSubject":subjects,
   };
 }

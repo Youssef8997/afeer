@@ -12,8 +12,10 @@ import 'lecture_screens.dart';
 
 class DoctorScreen extends StatefulWidget {
   final String subjectName;
+  final String? year;
+  final bool? add;
 
-  const DoctorScreen({super.key, required this.subjectName});
+  const DoctorScreen({super.key, required this.subjectName, this.add, this.year});
 
   @override
   State<DoctorScreen> createState() => _DoctorScreenState();
@@ -47,15 +49,30 @@ class _DoctorScreenState extends State<DoctorScreen> {
                       ),
                       trailing: Icon(Icons.arrow_forward_ios,color: ColorsManger.pColor),
                       onTap: () {
-                        context.appCuibt
-                            .getLectures(
-                            doctor: context.appCuibt.doctorList[i],
-                            subjectName: widget.subjectName)
-                            .then((value) => navigatorWid(
-                            page: LectureScreens(
-                                subjectName: widget.subjectName,doctor: context.appCuibt.doctorList[i] ),
-                            context: context,
-                            returnPage: true));
+                        if(widget.add==true){
+                          context.appCuibt
+                              .getAddLectures(
+                              doctor: context.appCuibt.doctorList[i],
+                              subjectName: widget.subjectName,
+                            year: widget.year
+                          )
+                              .then((value) => navigatorWid(
+                              page: LectureScreens(
+                                  subjectName: widget.subjectName,doctor: context.appCuibt.doctorList[i],year: widget.year,add: widget.add, ),
+                              context: context,
+                              returnPage: true));
+                        }else {
+                          context.appCuibt
+                              .getLectures(
+                              doctor: context.appCuibt.doctorList[i],
+                              subjectName: widget.subjectName)
+                              .then((value) => navigatorWid(
+                              page: LectureScreens(
+                                  subjectName: widget.subjectName,doctor: context.appCuibt.doctorList[i] ),
+                              context: context,
+                              returnPage: true));
+                        }
+
                       },
                       title: Text(context.appCuibt.doctorList[i],
                           style: FontsManger.largeFont(context)

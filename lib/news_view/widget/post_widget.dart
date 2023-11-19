@@ -99,7 +99,7 @@ class _PostWidgetState extends State<PostWidget> {
               ),
             ),
           if(widget.post.linkPdf!=null)
-            IconButton(onPressed: ()=>navigatorWid(page: PdfView(pdfLink: widget.post.linkPdf!)), icon: const Icon(Icons.picture_as_pdf)),
+            IconButton(onPressed: ()=>navigatorWid(page: PdfView(pdfLink: widget.post.linkPdf!),context: context,returnPage: true), icon: const Icon(Icons.picture_as_pdf)),
           const SizedBox(height:5),
           Row(
             children: [

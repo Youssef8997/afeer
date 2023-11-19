@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:afeer/splash/splash_screen.dart';
+import 'package:afeer/utls/dio.dart';
 import 'package:afeer/utls/notfi_handelr.dart';
 import 'package:afeer/utls/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  DioHelper.init();
    FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
 
    NotificationsHandler.init();

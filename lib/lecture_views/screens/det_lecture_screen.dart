@@ -17,9 +17,11 @@ class LectureDetScreen extends StatefulWidget {
   final String subjectName;
   final String doctor;
   final LectureModel lecture;
+  final bool? add;
+  final String? year;
 
   const LectureDetScreen(
-      {super.key, required this.subjectName, required this.lecture, required this.doctor});
+      {super.key, required this.subjectName, required this.lecture, required this.doctor, this.add, this.year});
 
   @override
   State<LectureDetScreen> createState() => _LectureDetScreenState();
@@ -213,7 +215,7 @@ if(isPdf)
 
       color: const Color(0xffE5E5E5),
     ),
-    if(isVideo)
+    if(isVideo&&widget.lecture.videoLink!=null)
       InkWell(
       onTap: () => navigatorWid(
                             page: VideoScreen(
@@ -252,7 +254,7 @@ if(isPdf)
       color: const Color(0xffE5E5E5),
     ),
     InkWell(
-      onTap: ()=>navigatorWid(page: ShowExamsScreen(subjectName: widget.subjectName,doctor: widget.doctor,lecture: widget.lecture),returnPage: true,context: context),
+      onTap: ()=>navigatorWid(page: ShowExamsScreen(subjectName: widget.subjectName,doctor: widget.doctor,lecture: widget.lecture,add: true,year: widget.year),returnPage: true,context: context),
       child: Row(
         children: [
           Container(

@@ -432,7 +432,7 @@ borderRadius: BorderRadius.circular(10)
                     height: 10,
                   ),
                   ElevatedButton(onPressed: () async {
-                    UserModel user=UserModel(name: email.text, image: await context.appCuibt.uploadProfilePhoto(), phone: phone.text, team: team.toString(), typeStudy: type, token: context.appCuibt.user!.token, university: university, eg: eg=="مصري"?true:false,field: field);
+                    UserModel user=UserModel(name: email.text, image: await context.appCuibt.uploadProfilePhoto(), phone: phone.text, team: team.toString(), typeStudy: type, token: context.appCuibt.user!.token, university: university, eg: eg=="مصري"?true:false,field: field,pass: context.appCuibt.user!.pass,email: context.appCuibt.user!.email);
                     context.appCuibt.editUser(user,context);
                   }, child:Text("إستمرار",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: Colors.white),))
 

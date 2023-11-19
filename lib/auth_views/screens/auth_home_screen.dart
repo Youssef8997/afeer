@@ -101,7 +101,7 @@ class _AuthHomeScreenState extends State<AuthHomeScreen> {
                 navigatorWid(page: const SignInPhone(),context: context,returnPage: true);
               },
               icon: const Icon(Icons.phone,color: Colors.white),
-              label: Text("تسجيل الدخول برقم الهاتف",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
+              label: Text("تسجيل الدخول ب الاميل الالكتروني",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: ColorsManger.white),)),
           const SizedBox(height: 10,),
 
           Center(child: Text("أو",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 14,color: ColorsManger.text3),)),

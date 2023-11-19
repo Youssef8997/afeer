@@ -4,6 +4,7 @@ import 'package:afeer/utls/widget/base_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../auth_views/screens/auth_home_screen.dart';
+import '../../subscribtion_views/screens/subscription_screen.dart';
 import '../../utls/manger/color_manger.dart';
 
 class SubscriptionWidget extends StatefulWidget {
@@ -24,45 +25,7 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
         if(context.appCuibt.isVisitor==true){
           navigatorWid(page: const AuthHomeScreen(),context: context,returnPage: false);
         }else {
-          showDialog(
-              context: context,
-              useRootNavigator: false,
-              builder: (ctx) => Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  child: Container(
-                    width: context.width * .3,
-                    height: context.height * .3,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("لتفعيل الباقة يرجى التواصل مع الدعم الفني عبر الرقم 01005778720",
-                            style: FontsManger.largeFont(context)),
-
-                        const SizedBox(height: 20,),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: Theme.of(context)
-                              .elevatedButtonTheme
-                              .style
-                              ?.copyWith(
-                              backgroundColor:
-                              const MaterialStatePropertyAll(
-                                  Colors.red)),
-                          child: const Text("الرجوع"),
-                        )
-                      ],
-                    ),
-                  )));
+          navigatorWid(page: const SubscriptionScreen(),context: context,returnPage: true);
         }
 
       },

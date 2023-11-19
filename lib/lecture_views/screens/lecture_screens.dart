@@ -13,7 +13,9 @@ import 'det_lecture_screen.dart';
 class LectureScreens extends StatefulWidget {
   final String subjectName;
   final String doctor;
-  const LectureScreens({super.key, required this.subjectName, required this.doctor});
+  final bool? add;
+  final String? year;
+  const LectureScreens({super.key, required this.subjectName, required this.doctor, this.add,  this.year});
 
   @override
   State<LectureScreens> createState() => _LectureScreensState();

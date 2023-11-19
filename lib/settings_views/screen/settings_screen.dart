@@ -3,6 +3,7 @@ import 'package:afeer/utls/extension.dart';
 import 'package:afeer/utls/manger/color_manger.dart';
 import 'package:afeer/utls/manger/font_manger.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../auth_views/screens/auth_home_screen.dart';
 import '../../chat_view/screens/chat_screen.dart';
+import '../../data/local_data.dart';
 import '../../news_view/screen/news_screen.dart';
 import '../../utls/manger/assets_manger.dart';
 import '../../utls/widget/base_widget.dart';
@@ -194,6 +196,86 @@ ListTile(
           :context.appCuibt.signOut(context),
       leading:  const Icon(Icons.logout,),
       title: Text("تسجيل الخروج",style: FontsManger.largeFont(context)?.copyWith(fontSize: 14)),
+    ),
+    if(!context.appCuibt.isVisitor)
+    ListTile(
+      onTap: (){
+        showDialog(
+            context: context,
+            useRootNavigator: false,
+            builder: (ctx) => Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                child: Container(
+                  width: context.width * .3,
+                  height: context.height * .3,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("حذف الحساب",
+                          style: FontsManger.largeFont(context)),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Text("سوف يتم حذف حسابك وكل المعلومات والاشتراكات الخاصة بك",
+                          style: FontsManger.mediumFont(context)?.copyWith(
+                            color: ColorsManger.text3
+                          )),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+
+                               FirebaseAuth.instance.currentUser!.delete();
+                               SharedPreference.removeDate(key: "token");
+                               context.appCuibt.user=null;
+                               navigatorWid(page: const AuthHomeScreen(),context: context,returnPage: false);
+                                },
+                                style: Theme.of(context)
+                                    .elevatedButtonTheme
+                                    .style
+                                    ?.copyWith(
+                                    backgroundColor:
+                                    const MaterialStatePropertyAll(
+                                        Colors.red)),
+                                child:  const Text("تاكيد"),
+                              )),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: Theme.of(context)
+                                    .elevatedButtonTheme
+                                    .style
+                                    ?.copyWith(
+                                    backgroundColor:
+                                    const MaterialStatePropertyAll(
+                                        Colors.green)),
+                                child:  const Text("الغاء"),
+                              )),
+                        ],
+                      )
+                    ],
+                  ),
+                )));
+      },
+      leading:  const Icon(Icons.delete,),
+      title: Text("حذف الحساب",style: FontsManger.largeFont(context)?.copyWith(fontSize: 14)),
     ),
 
   ],

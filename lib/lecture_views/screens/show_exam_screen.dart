@@ -12,6 +12,8 @@ import '../widget/exam_widget.dart';
 class ShowExamsScreen extends StatefulWidget {
   final String subjectName;
   final LectureModel lecture;
+  final bool? add;
+  final String? year;
 
 
   final String doctor;
@@ -20,7 +22,7 @@ class ShowExamsScreen extends StatefulWidget {
       {super.key,
         required this.subjectName,
         required this.lecture,
-        required this.doctor});
+        required this.doctor, this.add, this.year});
 
   @override
   State<ShowExamsScreen> createState() => _ShowExamsScreenState();
@@ -30,12 +32,23 @@ class _ShowExamsScreenState extends State<ShowExamsScreen> {
   List<ExamModel> exams = [];
   int page=0;
   void getData() async {
-    exams = await context.appCuibt.getExamLecture(
-      subjectName: widget.subjectName,
-      doctor: widget.doctor,
-      context: context,
-      lecture: widget.lecture,
-    );
+    if(widget.add==true){
+      exams = await context.appCuibt.getAddExamLecture(
+        subjectName: widget.subjectName,
+        doctor: widget.doctor,
+        context: context,
+        lecture: widget.lecture,
+        year: widget.year!
+      );
+    }else {
+      exams = await context.appCuibt.getExamLecture(
+        subjectName: widget.subjectName,
+        doctor: widget.doctor,
+        context: context,
+        lecture: widget.lecture,
+      );
+    }
+
     setState(() {});
   }
 

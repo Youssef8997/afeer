@@ -1,6 +1,7 @@
 import 'package:afeer/models/user_model.dart';
 import 'package:afeer/utls/extension.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../utls/manger/assets_manger.dart';
 import '../../utls/manger/color_manger.dart';
@@ -9,8 +10,7 @@ import '../../utls/widget/text_form.dart';
 
 class CompleteInfoScreen extends StatefulWidget {
   final String phone;
-  final String token;
-  const CompleteInfoScreen({super.key, required this.phone, required this.token});
+  const CompleteInfoScreen({super.key, required this.phone,});
 
   @override
   State<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
@@ -18,27 +18,30 @@ class CompleteInfoScreen extends StatefulWidget {
 
 class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   late TextEditingController name;
+  late TextEditingController name2;
   late TextEditingController email;
+  late TextEditingController pass;
   late TextEditingController phone;
-  int team=1;
-  String type="Academic year";
-  String field="";
-  String types="كلية";
-  String eg="مصري";
-  String university="";
-  List teem=[
+  int team = 1;
+  String type = "Academic year";
+  String field = "";
+  String types = "كلية";
+  String eg = "مصري";
+  String university = "";
+  List teem = [
     "الفرقه الاولي",
     "الفرقه الثانيه",
-  "الفرقه الثالثه",
+    "الفرقه الثالثه",
     "الفرقه الرابعة"
   ];
 
   @override
   void initState() {
     getData();
-    name=TextEditingController();
-    email=TextEditingController();
-    phone=TextEditingController(text: widget.phone);
+    name = TextEditingController();
+    email = TextEditingController();
+    pass = TextEditingController();
+    phone = TextEditingController(text: widget.phone);
     super.initState();
   }
   void getData(){
@@ -52,8 +55,9 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   @override
   void dispose() {
     name.dispose();
-    email.dispose();
     phone.dispose();
+    email.dispose();
+    pass.dispose();
     super.dispose();
   }
 
@@ -102,9 +106,24 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
             height: 30,
           ),
            TextFormWidget(
-             controller: email,
+             controller: name,
             label: 'إسمك باللغة العربية',
+          ),
+          const SizedBox(
+            height: 10,
+          ),
 
+          TextFormWidget(
+            controller: email,
+            label: 'البريد الالكتروني',
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+
+          TextFormWidget(
+            controller: pass,
+            label: 'كلمه المرور',
           ),
           const SizedBox(
             height: 10,
@@ -365,10 +384,21 @@ if(type=="Academic year")
           const SizedBox(
             height: 10,
           ),
-          ElevatedButton(onPressed: (){
-            UserModel user=UserModel(name: email.text, image: "", phone: widget.phone, team: team.toString(), typeStudy: type, token: widget.token, university: university, eg: eg=="مصري"?true:false,field: field);
-            context.appCuibt.createAccount(user,context);
-          }, child:Text("إستمرار",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: Colors.white),))
+          ElevatedButton(onPressed: () {
+                UserModel user = UserModel(
+                    name: name.text,
+                    image: "",
+                    phone: phone.text,
+                    team: team.toString(),
+                    typeStudy: type,
+                    token: const Uuid().v4(),
+                    university: university,
+                    eg: eg == "مصري" ? true : false,
+                    field: field,
+                    email: email.text,
+                    pass: pass.text);
+                context.appCuibt.signupEmailPassword(user1: user,pass: pass.text,email: email.text,context:  context);
+              }, child:Text("إستمرار",style: FontsManger.mediumFont(context)?.copyWith(fontSize: 16,color: Colors.white),))
 
         ]));
   }

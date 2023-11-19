@@ -18,23 +18,29 @@ class _VideoScreenState extends State<VideoScreen> {
  _controller = YoutubePlayerController(
    initialVideoId: widget.videoId,
    flags: const YoutubePlayerFlags(
+     hideControls: false,
+     showLiveFullscreenButton: true,
       autoPlay: true,
       mute: false,
-forceHD: true,
+forceHD: false ,
 
 
     ),
 
   );
+ _controller!.value.playbackQuality="144 p";
 
  _controller?.toggleFullScreenMode();
-
  super.initState();
   }
   @override
   Widget build(BuildContext context) {
+    _controller!.value.playbackQuality="144P";
+    _controller!.updateValue(_controller!.value);
 
-    return YoutubePlayerBuilder(
+    print( _controller!.value.playbackQuality);
+
+  return YoutubePlayerBuilder(
 
         player: YoutubePlayer(
           aspectRatio: (context.height/context.width),
@@ -61,6 +67,8 @@ forceHD: true,
             ),
             const SizedBox(width: 30.0),
             InkWell(onTap: (){
+              _controller!.toggleFullScreenMode();
+
               Navigator.pop(context);
               Navigator.pop(context);
             },child: const Icon(Icons.arrow_forward_outlined,color: Colors.white,size: 30),)
