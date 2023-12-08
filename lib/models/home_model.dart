@@ -4,11 +4,12 @@ class HomeModel{
   final List fiends;
   final List university;
   final List pay;
+  final bool applePay;
 final String? googleLink;
 final int version;
 final String? iosLink;
   HomeModel(
-      { required this.videoLink, required this.term,required this.fiends,required this.university,required this.pay,required this.version, required this.googleLink, required this.iosLink, });
+      { required this.applePay, required this.videoLink, required this.term,required this.fiends,required this.university,required this.pay,required this.version, required this.googleLink, required this.iosLink, });
 
 factory HomeModel.fromJson(Map<String,dynamic>json)=>HomeModel(
 
@@ -20,6 +21,7 @@ factory HomeModel.fromJson(Map<String,dynamic>json)=>HomeModel(
   fiends: json["fiends"],
   university: json["university"],
   pay: json["pay"],
+  applePay: json["applePay"],
 );
 }
 class CollageModel{

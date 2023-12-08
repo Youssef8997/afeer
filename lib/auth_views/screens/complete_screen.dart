@@ -335,52 +335,7 @@ if(type=="Academic year")
             label: 'رقم الهاتف',
 
           ),
-          const SizedBox(
-            height: 10,
-          ),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            width: context.width,
-            height: 43,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(width: 1,color: const Color(0xff707070))
-            ),
-            child: DropdownButtonFormField(
-              decoration:  InputDecoration(
-                  border: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  filled: true,
-                  fillColor: ColorsManger.white,
-                  label: Text(eg)),
-              items:[
-                DropdownMenuItem(
-                  value: "مصري",
-                  child:Text("مصري",style: FontsManger.mediumFont(context)),
-
-                ),
-                DropdownMenuItem(
-                  value: "وافد",
-                  child:Text("وافد",style: FontsManger.mediumFont(context)),
-
-                ),
-
-              ],
-              value: eg,
-              onChanged: (String? value) {
-                setState(() {
-                  eg = value!;
-
-                });
-              },
-            ),
-          ),
           const SizedBox(
             height: 10,
           ),

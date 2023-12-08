@@ -8,7 +8,6 @@ import 'package:afeer/utls/widget/base_app_Bar.dart';
 import 'package:afeer/utls/widget/base_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:pay/pay.dart';
 
 import '../../models/academic_year_model.dart';
 import '../../utls/payment_configurations.dart';
@@ -105,27 +104,6 @@ class _InVoiceScreenState extends State<InVoiceScreen> {
                           });
                         },
                         value: payment == "بطافات الدفع"),
-                  ),
-                if (context.appCuibt.home.pay.contains("Apple pay"))
-                  ApplePayButton(
-                    paymentConfiguration: PaymentConfiguration.fromJsonString(
-                        defaultApplePay),
-                    paymentItems: [
-                      PaymentItem(
-                        label: 'Total',
-                        amount: '0.01',
-                        status: PaymentItemStatus.final_price,
-                      )
-                    ],
-                    style: ApplePayButtonStyle.black,
-                    type: ApplePayButtonType.subscribe,
-                    margin: const EdgeInsets.only(top: 15.0),
-                    onPaymentResult: (re){
-                      print(re);
-                    },
-                    loadingIndicator: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
                   ),
                 ListTile(
                   title: const Text("كاش"),

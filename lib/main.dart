@@ -21,9 +21,9 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   DioHelper.init();
-   FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
 
-   NotificationsHandler.init();
+  NotificationsHandler.init();
   runApp(const MyApp());
 }
 
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AppCubit(),
-      child:MaterialApp(
+      child: MaterialApp(
           title: 'afeer',
           theme: lightTheme(),
           debugShowCheckedModeBanner: false,
@@ -46,12 +46,13 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: const [
-            Locale("ar", ),
+            Locale(
+              "ar",
+            ),
           ],
-          locale: const Locale("ar",)
-      ),
+          locale: const Locale(
+            "ar",
+          )),
     );
   }
 }
-
-

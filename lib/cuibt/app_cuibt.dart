@@ -15,9 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:motion_toast/motion_toast.dart';
@@ -55,6 +53,7 @@ class AppCubit extends Cubit<AppState> {
   XFile? file;
   int pos = 0;
   List<AcademicYear> subjectList = [];
+  List<AcademicYear> rev = [];
   List<LectureModel> lectureList = [];
   List<String> doctorList = [];
   List<String> additionalList = [];
@@ -78,7 +77,6 @@ class AppCubit extends Cubit<AppState> {
   }
 
   void createAccount(UserModel userNew, BuildContext context) {
-
     FirebaseFirestore.instance
         .collection("Users")
         .doc(userNew.token)
@@ -117,21 +115,19 @@ class AppCubit extends Cubit<AppState> {
   }
 
   Future<String> uploadProfilePhoto() {
-    if(file!=null){
+    if (file != null) {
       return FirebaseStorage.instance
           .ref()
           .child('profilePhoto/${user?.token}')
           .putFile(File(file!.path))
-
           .then((value) {
         return value.ref.getDownloadURL().then((value) {
           return value;
         });
       });
-    }else {
+    } else {
       return Future(() => "");
     }
-
   }
 
   Future pickerPhoto(context) async {
@@ -153,13 +149,16 @@ class AppCubit extends Cubit<AppState> {
         .then((value) {
       if (value.data()!["profileUrl"] != null) {
         navigatorWid(
-            page: CompleteInfoScreen(phone: value.data()!["phone"], ),
+            page: CompleteInfoScreen(
+              phone: value.data()!["phone"],
+            ),
             context: context,
             returnPage: false);
       } else {
         user = UserModel.fromJson(value.data()!);
-print(user!.toMap());
+        print(user!.toMap());
         getSubject();
+        getRev();
       }
       emit(GetInfo());
       return value.data()!["profileUrl"];
@@ -168,6 +167,7 @@ print(user!.toMap());
 
   void signOut(context) {
     FirebaseAuth.instance.signOut().then((value) {
+      user = null;
       navigatorWid(
           context: context, page: const AuthHomeScreen(), returnPage: false);
       SharedPreference.removeDate(key: "token");
@@ -257,75 +257,90 @@ print(user!.toMap());
           );
         } else {
           navigatorWid(
-              page: CompleteInfoScreen(phone: "", ),
+              page: CompleteInfoScreen(
+                phone: "",
+              ),
               context: context,
               returnPage: false);
         }
       });
+    }).catchError((onError) {
+      MotionToast.error(description: Text(onError.toString())).show(context);
     });
   }
 
-  Future <bool>getIsHavaAccount(String phoneNumber){
-   return FirebaseFirestore.instance.collection("Users").where("phone",isEqualTo: phoneNumber).get().then((value) {
-     if(value.docs.length==1){
-       UserModel newUser=UserModel.fromJson(value.docs[0].data());
-       if(newUser.subscription!=null){
-         user=newUser;
-         return true;
-       }else {
-         return false;
-       }
-     }else {
-       return false;
-     }
-   });
-}
+  Future<bool> getIsHavaAccount(String phoneNumber) {
+    return FirebaseFirestore.instance
+        .collection("Users")
+        .where("phone", isEqualTo: phoneNumber)
+        .get()
+        .then((value) {
+      if (value.docs.length == 1) {
+        UserModel newUser = UserModel.fromJson(value.docs[0].data());
+        if (newUser.subscription != null) {
+          user = newUser;
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    });
+  }
+
   void signupEmailPassword({
     required BuildContext context,
     required String email,
     required String pass,
     required UserModel user1,
   }) async {
-    await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: pass)
-        .then((value) async {
-      UserModel? user2;
-     await getIsHavaAccount(user1.phone).then((v) {
-        print(v);
-        if (v==true){
-          user2=UserModel(
-              name: user!.name,
-              image: user!.image,
-              phone: user!.phone,
-              email: email,
-              pass: pass,
-              team: user!.team,
-              field: user!.field,
-              typeStudy: user!.typeStudy,
-              token: value.user!.uid,
-              university: user!.university,
-              addSubject: user!.addSubject,
-              subscription: user!.subscription,
-              eg: user!.eg);
-        }else {
-         user2 = UserModel(
-              name: user1.name,
-              image: user1.image,
-              phone: user1.phone,
-              email: email,
-              pass: pass,
-              team: user1.team,
-              field: user1.field,
-              typeStudy: user1.typeStudy,
-              token: value.user!.uid,
-              university: user1.university,
-              eg: user1.eg);
+    showLoading(context);
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: pass)
+          .then((value) async {
+        Navigator.pop(context);
+        UserModel? user2;
+        await getIsHavaAccount(user1.phone).then((v) {
+          if (v == true) {
+            user2 = UserModel(
+                name: user!.name,
+                image: user!.image,
+                phone: user!.phone,
+                email: email,
+                pass: pass,
+                team: user!.team,
+                field: user!.field,
+                typeStudy: user!.typeStudy,
+                token: value.user!.uid,
+                university: user!.university,
+                addSubject: user!.addSubject,
+                subscription: user!.subscription,
+                eg: user!.eg);
+          } else {
+            user2 = UserModel(
+                name: user1.name,
+                image: user1.image,
+                phone: user1.phone,
+                email: email,
+                pass: pass,
+                team: user1.team,
+                field: user1.field,
+                typeStudy: user1.typeStudy,
+                token: value.user!.uid,
+                university: user1.university,
+                eg: user1.eg);
+          }
+        });
 
-        }
+        createAccount(user2!, context);
       });
+    } catch (E) {
+      Navigator.pop(context);
 
-      createAccount(user2!, context);
-    });
+      MotionToast.error(description: Text(E.toString())).show(context);
+    }
   }
 
   Future<void> signInWithPhone(
@@ -346,7 +361,6 @@ print(user!.toMap());
             context: context,
             page: CompleteInfoScreen(
               phone: phoneNumber,
-
             ),
             returnPage: false,
           );
@@ -359,9 +373,7 @@ print(user!.toMap());
                 page: const HomeScreen(),
                 returnPage: false,
               );
-            } else {
-
-            }
+            } else {}
           });
         }
       });
@@ -462,6 +474,38 @@ print(user!.toMap());
         .collection("teams")
         .doc(user?.team)
         .collection(home.term)
+        .where("image", isNotEqualTo: "")
+        .get()
+        .then((value) {
+      subjectList = List.generate(value.docs.length,
+          (index) => AcademicYear.fromJson(value.docs[index].data()));
+      emit(GetSubject());
+    });
+  }
+
+  Future getRev() async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .where("isRev", isEqualTo: true)
+        .get()
+        .then((value) {
+      rev = List.generate(value.docs.length,
+          (index) => AcademicYear.fromJson(value.docs[index].data()));
+      emit(GetSubject());
+    });
+  }
+
+  Future getSubjectV() async {
+    FirebaseFirestore.instance
+        .collection("كلية التجارة")
+        .doc("جامعة القاهرة")
+        .collection("teams")
+        .doc("1")
+        .collection(home.term)
         .get()
         .then((value) {
       subjectList = List.generate(value.docs.length,
@@ -486,7 +530,26 @@ print(user!.toMap());
       emit(GetSubjectDoctor());
     });
   }
-  Future getAddSubjectDoctor({required String subjectName,year}) async {
+
+  Future getSubjectDoctorV({required String subjectName}) async {
+    FirebaseFirestore.instance
+        .collection("كلية التجارة")
+        .doc("جامعة القاهرة")
+        .collection("teams")
+        .doc("1")
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .limit(1)
+        .get()
+        .then((value) {
+      doctorList = List.generate(
+          value.docs.length, (index) => value.docs[index].get("name"));
+      emit(GetSubjectDoctor());
+    });
+  }
+
+  Future getAddSubjectDoctor({required String subjectName, year}) async {
     FirebaseFirestore.instance
         .collection(user!.field)
         .doc(user?.university)
@@ -525,8 +588,33 @@ print(user!.toMap());
       emit(GetLecture());
     });
   }
+
+  Future getLecturesV(
+      {required String subjectName, required String doctor}) async {
+    return await FirebaseFirestore.instance
+        .collection("كلية التجارة")
+        .doc("جامعة القاهرة")
+        .collection("teams")
+        .doc("1")
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctor)
+        .collection("lecture")
+        .orderBy(
+          "time",
+        )
+        .limit(1)
+        .get()
+        .then((value) {
+      lectureList = List.generate(value.docs.length,
+          (index) => LectureModel.fromJson(value.docs[index].data()));
+      emit(GetLecture());
+    });
+  }
+
   Future getAddLectures(
-      {required String subjectName, required String doctor,year}) async {
+      {required String subjectName, required String doctor, year}) async {
     return await FirebaseFirestore.instance
         .collection(user!.field)
         .doc(user?.university)
@@ -538,15 +626,16 @@ print(user!.toMap());
         .doc(doctor)
         .collection("lecture")
         .orderBy(
-      "time",
-    )
+          "time",
+        )
         .get()
         .then((value) {
       lectureList = List.generate(value.docs.length,
-              (index) => LectureModel.fromJson(value.docs[index].data()));
+          (index) => LectureModel.fromJson(value.docs[index].data()));
       emit(GetLecture());
     });
   }
+
   Future getExamLecture({
     required String subjectName,
     required String doctor,
@@ -571,6 +660,7 @@ print(user!.toMap());
           (index) => ExamModel.fromJson(value.docs[index].data()));
     });
   }
+
   Future getAddExamLecture({
     required String subjectName,
     required String doctor,
@@ -593,9 +683,10 @@ print(user!.toMap());
         .get()
         .then((value) {
       return List.generate(value.docs.length,
-              (index) => ExamModel.fromJson(value.docs[index].data()));
+          (index) => ExamModel.fromJson(value.docs[index].data()));
     });
   }
+
   Future getAdditionalSubject() async {
     return FirebaseFirestore.instance
         .collection("additional")
@@ -740,7 +831,7 @@ print(user!.toMap());
   Future getPosts() async {
     FirebaseFirestore.instance
         .collection("news")
-        .orderBy("time",descending:true )
+        .orderBy("time", descending: true)
         .get()
         .then((value) {
       posts = List.generate(value.docs.length,
@@ -849,24 +940,22 @@ print(user!.toMap());
 //payment function
   Future getFirstToken(
       double money, BuildContext context, SubModel subs) async {
-    try{
+    try {
       await DioHelper.postData(
           url: "https://accept.paymob.com/api/auth/tokens",
           data: {"api_key": payMobApi}).then((value) {
         tokenModel = TokenModel.fromJson(value.data);
         getIdOrder(money, context, tokenModel!.token, subs);
       });
-    }catch(E){
+    } catch (E) {
       print(E);
       print("getFirstToken");
-
     }
-
   }
 
   Future getIdOrder(
       double money, BuildContext context, String token, SubModel subs) async {
-    try{
+    try {
       await DioHelper.postData(
           url: "https://accept.paymob.com/api/ecommerce/orders",
           data: {
@@ -877,13 +966,12 @@ print(user!.toMap());
             "items": [],
           }).then((value) {
         orderIdModel = OrderIdModel.fromJson(value.data);
-      }).catchError((e){
+      }).catchError((e) {
         print(e);
         print("getIdOrder");
       }).whenComplete(() =>
           getFinalTokenId(money, context, token, orderIdModel!.orderId, subs));
-
-    }catch(e){
+    } catch (e) {
       print(e);
       print("getIdOrder");
     }
@@ -891,7 +979,7 @@ print(user!.toMap());
 
   Future getFinalTokenId(double money, BuildContext context, String token,
       orderId, SubModel subs) async {
-    try{
+    try {
       DioHelper.postData(
           url: "https://accept.paymob.com/api/acceptance/payment_keys",
           data: {
@@ -901,21 +989,21 @@ print(user!.toMap());
             "order_id": orderId,
             "billing_data": {
               "apartment": "NA",
-              "email": "youssefahmed11@gmail.com",
+              "email": user?.email ?? "youssefahmed11@gmail.com",
               "floor": "Na",
               "first_name": user?.name,
               "street": "NA",
               "building": "NA",
-              "phone_number":  user?.phone,
+              "phone_number": user?.phone,
               "shipping_method": "NA",
               "postal_code": "NA",
               "city": "EGYPT",
               "country": "PortSaid",
-              "last_name": "sd",
+              "last_name": user?.name,
               "state": "Utah"
             },
             "currency": "EGP",
-            "integration_id": "3488147",
+            "integration_id": "3494897",
             "lock_order_when_paid": "false"
           }).then((value) {
         finalTokenId = FinalTokenId.fromJson(value.data);
@@ -936,7 +1024,7 @@ print(user!.toMap());
               Expanded(
                 child: WebView(
                     initialUrl:
-                    "https://accept.paymob.com/api/acceptance/iframes/736701?payment_token=${context.read<AppCubit>().finalTokenId!.token}",
+                        "https://accept.paymob.com/api/acceptance/iframes/736701?payment_token=${context.read<AppCubit>().finalTokenId!.token}",
                     debuggingEnabled: true,
                     javascriptMode: JavascriptMode.unrestricted,
                     onPageStarted: (url) => context
@@ -950,15 +1038,14 @@ print(user!.toMap());
           enableDrag: false,
           shape: const RoundedRectangleBorder(),
         );
-      }).catchError((e){
+      }).catchError((e) {
         print(e);
         print("getFinalTokenId");
       });
-    }catch(e){
+    } catch (e) {
       print(e);
       print("getFinalTokenId");
     }
-
   }
 
   String? fb;
