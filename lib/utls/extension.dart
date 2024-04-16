@@ -5,19 +5,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cuibt/app_cuibt.dart';
 
 extension Cuibt on BuildContext {
-  AppCubit get appCuibt{
+  AppCubit get appCuibt {
     return read<AppCubit>();
   }
 }
 
 extension Height on BuildContext {
-  double get height{
-    return MediaQuery.of(this).size.height;
+  double get height {
+    return MediaQuery
+        .of(this)
+        .size
+        .height;
   }
 }
 extension Width on BuildContext {
-  double get width{
-    return MediaQuery.of(this).size.width;
+  double get width {
+    return MediaQuery
+        .of(this)
+        .size
+        .width;
   }
 }
 

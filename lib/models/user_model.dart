@@ -11,6 +11,7 @@ class UserModel {
   final String team;
   final String typeStudy;
   final String token;
+  final String? tokenDevice;
   final String university;
   final List? addSubject;
   final String field;
@@ -24,6 +25,7 @@ class UserModel {
       required this.phone,
       required this.email,
       this.addSubject,
+      this.tokenDevice,
       required this.pass,
       required this.team,
       required this.field,
@@ -37,12 +39,13 @@ class UserModel {
       phone: json["phone"],
       name: json["name"],
       image: json["image"],
-      team: json["team"],
+      team: json["team"] ?? "",
       typeStudy: json["typeStudy"],
       pass: json["pass"] ?? "",
       email: json["email"] ?? "",
       field: json["field"],
       token: json["token"],
+      tokenDevice: json["tokenDevice"],
       university: json["university"],
       subscriptionRev: json["subscriptionRev"] ?? [],
       subscription: json["subscription"] != null
@@ -61,11 +64,20 @@ class UserModel {
         "typeStudy": typeStudy,
         "token": token,
         "field": field,
+        "tokenDevice": tokenDevice,
         "university": university,
         "eg": eg,
         "team": team,
         "pass": pass,
         "email": email,
-        "addSubject": addSubject
+        "addSubject": addSubject == null
+            ? []
+            : addSubject!.isNotEmpty
+                ? List.generate(
+                    addSubject!.length, (index) => addSubject![index].toMap())
+                : [],
+        "subscriptionRev": subscriptionRev,
+        "subscription":
+            subscription?.toMap(subscription?.id, subscription?.singleSubject),
       };
 }

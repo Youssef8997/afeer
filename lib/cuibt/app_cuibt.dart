@@ -1,14 +1,19 @@
 // ignore_for_file: use_build_context_synchronously, invalid_return_type_for_catch_error, empty_catches, deprecated_member_use
 
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:afeer/cuibt/app_state.dart';
 import 'package:afeer/data/local_data.dart';
 import 'package:afeer/models/comment_model.dart';
+import 'package:afeer/models/fun_model.dart';
 import 'package:afeer/models/home_model.dart';
 import 'package:afeer/models/order_id_model.dart';
+import 'package:afeer/models/q_model.dart';
 import 'package:afeer/models/user_model.dart';
 import 'package:afeer/utls/widget/base_widget.dart';
+import 'package:afeer/views/home_layout/home_layout.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,32 +21,42 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:motion_toast/motion_toast.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../auth_views/screens/auth_home_screen.dart';
-import '../auth_views/screens/complete_screen.dart';
-import '../auth_views/screens/end_sign_up_screen.dart';
-import '../home_view/home_layout.dart';
 import '../models/academic_year_model.dart';
+import '../models/additional_subject_model.dart';
 import '../models/chat_list_model.dart';
 import '../models/chat_model.dart';
 import '../models/exam_model.dart';
 import '../models/final_token_model.dart';
 import '../models/lecture_model.dart';
 import '../models/m3hd_model.dart';
+import '../models/notification_model.dart';
 import '../models/posts_model.dart';
 import '../models/sub_model.dart';
 import '../models/token_model.dart';
-import '../subscribtion_views/screens/succses_page.dart';
 import '../update_screen.dart';
+import '../utls/crypto_helpear.dart';
 import '../utls/dio.dart';
 import '../utls/manger/assets_manger.dart';
 import '../utls/manger/font_manger.dart';
+import '../views/auth_views/screens/auth_home_screen.dart';
+import '../views/auth_views/screens/complete_screen.dart';
+import '../views/auth_views/screens/end_sign_up_screen.dart';
+import '../views/home_view/home_layout.dart';
+import '../views/lecture_views/screens/video_offline_screen.dart';
+import '../views/settings_views/screen/settings_screen.dart';
+import '../views/subscribtion_views/screens/succses_page.dart';
+import 'package:excel/excel.dart';
 
 class AppCubit extends Cubit<AppState> {
   AppCubit() : super(AppInitial());
@@ -53,11 +68,16 @@ class AppCubit extends Cubit<AppState> {
   XFile? file;
   int pos = 0;
   List<AcademicYear> subjectList = [];
+  List<Widget> body = [HomeScreen(), SettingsScreen()];
+  PageController page = PageController();
+  int indexScaffold = 0;
   List<AcademicYear> rev = [];
   List<LectureModel> lectureList = [];
+  List<FunModel> fun = [];
+  List<Map> newAdd = [];
   List<String> doctorList = [];
-  List<String> additionalList = [];
-  List<M3hdModel> lectureAdditionalList = [];
+  List<AdditionalSubject> additionalList = [];
+  List<LectureModel> lectureAdditionalList = [];
   List<SubModel> subList = [];
   List<ChatListModel> listChat = [];
   int index = 1;
@@ -65,6 +85,7 @@ class AppCubit extends Cubit<AppState> {
   List<PostsModel> posts = [];
   PageController pageController = PageController();
   bool isVisitor = false;
+  bool isLoading = false;
 
   void changePos(value) {
     pos = value;
@@ -73,6 +94,13 @@ class AppCubit extends Cubit<AppState> {
 
   void changeIndex(value) {
     index = value;
+    emit(ChangePos());
+  }
+
+  void changeIndexS(value) {
+    indexScaffold = value;
+    page.animateToPage(value,
+        duration: Duration(milliseconds: 600), curve: Curves.easeIn);
     emit(ChangePos());
   }
 
@@ -102,8 +130,10 @@ class AppCubit extends Cubit<AppState> {
         .doc(userNew.token)
         .update(userNew.toMap())
         .then((value) async {
+      Navigator.pop(context);
+      indexScaffold = 0;
       navigatorWid(
-          page: const HomeScreen(), returnPage: false, context: context);
+          page: const HomeLayout(), returnPage: false, context: context);
 
       user = userNew;
       String topic =
@@ -130,6 +160,26 @@ class AppCubit extends Cubit<AppState> {
     }
   }
 
+  Future<String> uploadExcel() async {
+    Directory? directory = await getDownloadsDirectory();
+
+    File saveLocation = File("${directory!.path}/yoyo.xlsx");
+
+    print("start");
+    return FirebaseStorage.instance
+        .ref()
+        .child('profilePhoto/yoyo')
+        .putFile(saveLocation)
+        .then((value) {
+      print("procc");
+
+      return value.ref.getDownloadURL().then((value) {
+        print(value);
+        return value;
+      });
+    });
+  }
+
   Future pickerPhoto(context) async {
     file = await ImagePicker()
         .pickImage(source: ImageSource.gallery)
@@ -141,7 +191,7 @@ class AppCubit extends Cubit<AppState> {
     emit(PickPhoto());
   }
 
-  Future getInfo(uid, BuildContext context) async {
+  Future<UserModel> getInfo(uid, BuildContext context) async {
     return await FirebaseFirestore.instance
         .collection("Users")
         .doc(uid)
@@ -150,7 +200,7 @@ class AppCubit extends Cubit<AppState> {
       if (value.data()!["profileUrl"] != null) {
         navigatorWid(
             page: CompleteInfoScreen(
-              phone: value.data()!["phone"],
+              email: value.data()!["phone"],
             ),
             context: context,
             returnPage: false);
@@ -161,7 +211,17 @@ class AppCubit extends Cubit<AppState> {
         getRev();
       }
       emit(GetInfo());
-      return value.data()!["profileUrl"];
+      return UserModel.fromJson(value.data()!);
+    });
+  }
+
+  Future<UserModel> getInfoById(uid, BuildContext context) async {
+    return await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .get()
+        .then((value) {
+      return UserModel.fromJson(value.data()!);
     });
   }
 
@@ -244,27 +304,52 @@ class AppCubit extends Cubit<AppState> {
     required String email,
     required String pass,
   }) async {
+    isLoading = true;
+    emit(LoadingState());
     await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: pass)
         .then((value) async {
-      SharedPreference.setDate(key: "token", value: value.user!.uid);
-      getInfo(value.user?.uid, context).then((value) {
-        if (value == null) {
+      indexScaffold = 0;
+      getInfo(value.user?.uid, context).then((e) async {
+        if (e.tokenDevice ==
+            await SharedPreference.getDate(key: "tokenDevice")) {
+          SharedPreference.setDate(key: "token", value: value.user!.uid);
+
           navigatorWid(
             context: context,
-            page: const HomeScreen(),
+            page: const HomeLayout(),
             returnPage: false,
           );
-        } else {
-          navigatorWid(
-              page: CompleteInfoScreen(
-                phone: "",
-              ),
+        } else if (e.tokenDevice == "") {
+          String? token = await FirebaseMessaging.instance.getToken();
+          FirebaseFirestore.instance
+              .collection("Users")
+              .doc(e.token)
+              .update({"tokenDevice": token}).then((v) {
+            SharedPreference.setDate(key: "tokenDevice", value: token);
+            SharedPreference.setDate(key: "token", value: value.user!.uid);
+            navigatorWid(
               context: context,
-              returnPage: false);
+              page: const HomeLayout(),
+              returnPage: false,
+            );
+          });
+        } else {
+          SnackBar snackBar = SnackBar(
+            content: Text(
+                "عفوا انت لست مسجل في هذا الحساب من فضلك توجه الي خدمه العملاء",
+                style: FontsManger.largeFont(context)
+                    ?.copyWith(color: Colors.white)),
+            backgroundColor: Colors.red,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       });
+      isLoading = false;
+      emit(LoadingState());
     }).catchError((onError) {
+      isLoading = false;
+      emit(LoadingState());
       MotionToast.error(description: Text(onError.toString())).show(context);
     });
   }
@@ -295,20 +380,23 @@ class AppCubit extends Cubit<AppState> {
     required String pass,
     required UserModel user1,
   }) async {
-    showLoading(context);
+    isLoading = true;
+    emit(LoadingState());
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: pass)
           .then((value) async {
-        Navigator.pop(context);
+        String? token = await FirebaseMessaging.instance.getToken();
+
         UserModel? user2;
-        await getIsHavaAccount(user1.phone).then((v) {
+        await getIsHavaAccount(user1.phone).then((v) async {
           if (v == true) {
             user2 = UserModel(
                 name: user!.name,
                 image: user!.image,
                 phone: user!.phone,
                 email: email,
+                tokenDevice: token,
                 pass: pass,
                 team: user!.team,
                 field: user!.field,
@@ -318,11 +406,13 @@ class AppCubit extends Cubit<AppState> {
                 addSubject: user!.addSubject,
                 subscription: user!.subscription,
                 eg: user!.eg);
+            SharedPreference.setDate(key: "tokenDevice", value: token);
           } else {
             user2 = UserModel(
                 name: user1.name,
                 image: user1.image,
                 phone: user1.phone,
+                tokenDevice: token,
                 email: email,
                 pass: pass,
                 team: user1.team,
@@ -331,15 +421,18 @@ class AppCubit extends Cubit<AppState> {
                 token: value.user!.uid,
                 university: user1.university,
                 eg: user1.eg);
+            SharedPreference.setDate(key: "tokenDevice", value: token);
           }
         });
-
         createAccount(user2!, context);
+        isLoading = false;
+        emit(LoadingState());
       });
     } catch (E) {
-      Navigator.pop(context);
-
-      MotionToast.error(description: Text(E.toString())).show(context);
+      isLoading = false;
+      emit(LoadingState());
+      MotionToast.error(description: Text("هذا البريد موجود بالفعل"))
+          .show(context);
     }
   }
 
@@ -360,7 +453,7 @@ class AppCubit extends Cubit<AppState> {
           navigatorWid(
             context: context,
             page: CompleteInfoScreen(
-              phone: phoneNumber,
+              email: phoneNumber,
             ),
             returnPage: false,
           );
@@ -370,7 +463,7 @@ class AppCubit extends Cubit<AppState> {
             if (value == null) {
               navigatorWid(
                 context: context,
-                page: const HomeScreen(),
+                page: const HomeLayout(),
                 returnPage: false,
               );
             } else {}
@@ -383,6 +476,40 @@ class AppCubit extends Cubit<AppState> {
         title: const Text("error"),
       ).show(context);
     }
+  }
+
+  Future signInWithFacebook(BuildContext context) async {
+    // Trigger the sign-in flow
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+
+    // Create a credential from the access token
+    final OAuthCredential facebookAuthCredential =
+        FacebookAuthProvider.credential(loginResult.accessToken!.token);
+
+    // Once signed in, return the UserCredential
+    FirebaseAuth.instance
+        .signInWithCredential(facebookAuthCredential)
+        .then((user) {
+      if (user.additionalUserInfo!.isNewUser) {
+        navigatorWid(
+          context: context,
+          page: CompleteInfoScreen(
+            email: user.user!.email!,
+          ),
+          returnPage: false,
+        );
+      } else {
+        getInfo(user.user?.uid, context).then((value) async {
+          SharedPreference.setDate(key: "token", value: user.user!.uid);
+
+          navigatorWid(
+            context: context,
+            page: const HomeLayout(),
+            returnPage: false,
+          );
+        });
+      }
+    });
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
@@ -398,23 +525,51 @@ class AppCubit extends Cubit<AppState> {
       );
       await FirebaseAuth.instance
           .signInWithCredential(credential)
-          .then((value) async {
-        if (value.additionalUserInfo!.isNewUser) {
+          .then((user) async {
+        if (user.additionalUserInfo!.isNewUser) {
           navigatorWid(
             context: context,
             page: CompleteInfoScreen(
-              phone: "",
+              email: user.user!.email!,
             ),
             returnPage: false,
           );
         } else {
-          SharedPreference.setDate(key: "token", value: value.user!.uid);
-          await getInfo(value.user!.uid, context);
-          navigatorWid(
-            context: context,
-            page: const HomeScreen(),
-            returnPage: false,
-          );
+          getInfo(user.user?.uid, context).then((e) async {
+            if (e.tokenDevice ==
+                await SharedPreference.getDate(key: "tokenDevice")) {
+              SharedPreference.setDate(key: "token", value: user.user!.uid);
+
+              navigatorWid(
+                context: context,
+                page: const HomeLayout(),
+                returnPage: false,
+              );
+            } else if (e.tokenDevice == "") {
+              String? token = await FirebaseMessaging.instance.getToken();
+              FirebaseFirestore.instance
+                  .collection("Users")
+                  .doc(e.token)
+                  .update({"tokenDevice": token}).then((v) {
+                SharedPreference.setDate(key: "tokenDevice", value: token);
+                SharedPreference.setDate(key: "token", value: user.user!.uid);
+                navigatorWid(
+                  context: context,
+                  page: const HomeLayout(),
+                  returnPage: false,
+                );
+              });
+            } else {
+              SnackBar snackBar = SnackBar(
+                content: Text(
+                    "عفوا انت لست مسجل في هذا الحساب من فضلك توجه الي خدمه العملاء",
+                    style: FontsManger.largeFont(context)
+                        ?.copyWith(color: Colors.white)),
+                backgroundColor: Colors.red,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          });
         }
       });
     }
@@ -444,6 +599,7 @@ class AppCubit extends Cubit<AppState> {
         .then((value) async {
       home = HomeModel.fromJson(value.data()!);
       await getCollage();
+      await getFun();
 
       if (home.version != version) {
         navigatorWid(
@@ -463,23 +619,69 @@ class AppCubit extends Cubit<AppState> {
           .then((value) {
         collage = CollageModel.fromJson(value.data()!);
         emit(GetCollage());
+        return 0;
       });
     } catch (e) {}
   }
 
   Future getSubject() async {
+    lectureList = [];
     FirebaseFirestore.instance
         .collection(user!.field)
         .doc(user?.university)
         .collection("teams")
         .doc(user?.team)
         .collection(home.term)
-        .where("image", isNotEqualTo: "")
+        .where("isRev", isNotEqualTo: true)
         .get()
-        .then((value) {
+        .then((value) async {
       subjectList = List.generate(value.docs.length,
           (index) => AcademicYear.fromJson(value.docs[index].data()));
+      for (var element in subjectList) {
+        Map map = await getLastLecture(subjectName: element.name);
+        newAdd.add({
+          "value": map["Lecture"],
+          "doctor": map["doc"],
+          "image": element.image,
+          "name": element.name,
+        });
+      }
       emit(GetSubject());
+    });
+  }
+
+  Future<Map> getLastLecture({required String subjectName}) async {
+    return FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .get()
+        .then((value) async {
+      return await FirebaseFirestore.instance
+          .collection(user!.field)
+          .doc(user?.university)
+          .collection("teams")
+          .doc(user?.team)
+          .collection(home.term)
+          .doc(subjectName)
+          .collection("doctor")
+          .doc(value.docs.first.get("name"))
+          .collection("lecture")
+          .orderBy(
+            "time",
+          )
+          .limitToLast(2)
+          .get()
+          .then((e) {
+        return {
+          "Lecture": LectureModel.fromJson(e.docs[0].data()),
+          "doc": value.docs[0].get("name")
+        };
+      });
     });
   }
 
@@ -500,6 +702,7 @@ class AppCubit extends Cubit<AppState> {
   }
 
   Future getSubjectV() async {
+    print("test");
     FirebaseFirestore.instance
         .collection("كلية التجارة")
         .doc("جامعة القاهرة")
@@ -510,6 +713,16 @@ class AppCubit extends Cubit<AppState> {
         .then((value) {
       subjectList = List.generate(value.docs.length,
           (index) => AcademicYear.fromJson(value.docs[index].data()));
+      FirebaseFirestore.instance
+          .collection("كلية التجارة")
+          .doc("جامعة القاهرة")
+          .collection("home")
+          .doc("home")
+          .get()
+          .then((value) {
+        collage = CollageModel.fromJson(value.data()!);
+        emit(GetCollage());
+      });
       emit(GetSubject());
     });
   }
@@ -692,8 +905,8 @@ class AppCubit extends Cubit<AppState> {
         .collection("additional")
         .get()
         .then((value) {
-      additionalList = List.generate(
-          value.docs.length, (index) => value.docs[index].get("name"));
+      additionalList = List.generate(value.docs.length,
+          (index) => AdditionalSubject.fromJson(value.docs[index].data()));
       emit(GetAdditionalSubject());
     });
   }
@@ -706,7 +919,7 @@ class AppCubit extends Cubit<AppState> {
         .get()
         .then((value) {
       lectureAdditionalList = List.generate(value.docs.length,
-          (index) => M3hdModel.fromJson(value.docs[index].data()));
+          (index) => LectureModel.fromJson(value.docs[index].data()));
       emit(GetAdditionalSubject());
     });
   }
@@ -730,7 +943,7 @@ class AppCubit extends Cubit<AppState> {
         .get()
         .then((value) {
       lectureAdditionalList = List.generate(value.docs.length,
-          (index) => M3hdModel.fromJson(value.docs[index].data()));
+          (index) => LectureModel.fromJson(value.docs[index].data()));
       emit(GetAdditionalSubject());
     });
   }
@@ -1006,6 +1219,23 @@ class AppCubit extends Cubit<AppState> {
             "integration_id": "3494897",
             "lock_order_when_paid": "false"
           }).then((value) {
+        WebViewController controller = WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setBackgroundColor(const Color(0x00000000))
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onProgress: (int progress) {
+                // Update loading bar.
+              },
+              onPageStarted: (url) =>
+                  context.read<AppCubit>().getVisaSuccess(url, context, subs),
+              onPageFinished: (String url) {},
+              onWebResourceError: (WebResourceError error) {},
+            ),
+          )
+          ..loadRequest(Uri.parse(
+            "https://accept.paymob.com/api/acceptance/iframes/736701?payment_token=${context.read<AppCubit>().finalTokenId!.token}",
+          ));
         finalTokenId = FinalTokenId.fromJson(value.data);
         Navigator.pop(context);
         showModalBottomSheet(
@@ -1022,15 +1252,9 @@ class AppCubit extends Cubit<AppState> {
                 icon: Icon(Icons.arrow_back_outlined),
               ),
               Expanded(
-                child: WebView(
-                    initialUrl:
-                        "https://accept.paymob.com/api/acceptance/iframes/736701?payment_token=${context.read<AppCubit>().finalTokenId!.token}",
-                    debuggingEnabled: true,
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onPageStarted: (url) => context
-                        .read<AppCubit>()
-                        .getVisaSuccess(url, context, subs)),
-              ),
+                  child: WebViewWidget(
+                controller: controller,
+              )),
             ],
           ),
           isScrollControlled: true,
@@ -1085,6 +1309,396 @@ class AppCubit extends Cubit<AppState> {
         .doc(user.token)
         .update({"subscription": sub.toMap(sub.id, subject)}).then((value) {
       getInfo(user.token, context);
+    });
+  }
+
+  List<Map> notes = [];
+
+  Future addNotes(
+      {required String subjectName,
+      required String doctorName,
+      required String lectureName,
+      required String notes}) async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("notes")
+        .add({
+      "notes": notes,
+      "userId": user!.token,
+      "time": Timestamp.now(),
+    });
+  }
+
+  Future deleteNotes(
+      {required String subjectName,
+      required String doctorName,
+      required String lectureName,
+      required String id}) async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("notes")
+        .doc(id)
+        .delete();
+  }
+
+  Future editNotes(
+      {required String subjectName,
+      required String doctorName,
+      required String lectureName,
+      required String id,
+      required String note}) async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("notes")
+        .doc(id)
+        .update({"notes": note});
+  }
+
+  Future getNotes({
+    required String subjectName,
+    required String doctorName,
+    required String lectureName,
+  }) async {
+    notes = [];
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("notes")
+        .where("userId", isEqualTo: user!.token)
+        .orderBy("time", descending: true)
+        .get()
+        .then((value) {
+      notes = List<Map>.generate(
+          value.docs.length,
+          (index) => {
+                "text": value.docs[index].get("notes"),
+                "id": value.docs[index].id
+              });
+      emit(GetNote());
+    });
+  }
+
+  List<NotificationModel> notification = [];
+
+  Future getNotification(topic) async {
+    await FirebaseFirestore.instance
+        .collection("AppSettings")
+        .doc("notification")
+        .collection(topic)
+        .orderBy("date", descending: true)
+        .get()
+        .then((value) {
+      print(value.docs.length);
+      notification = List.generate(value.docs.length,
+          (index) => NotificationModel.fromJson(value.docs[index].data()));
+      emit(GetNotification());
+    });
+  }
+
+  Future getFun() async {
+    FirebaseFirestore.instance.collection("fun").get().then((value) {
+      fun = List.generate(value.docs.length,
+          (index) => FunModel.fromJson(value.docs[index].data()));
+      emit(GetFun());
+    });
+  }
+
+  void change() {
+    emit(GetFun());
+  }
+
+  Future addQ(
+      {required String subjectName,
+      required String doctorName,
+      required String lectureName,
+      required String q,
+      required int min}) async {
+    QModel qe = QModel(
+        id: Uuid().v4(),
+        userId: user!.token,
+        user: Future(() => user!),
+        q: q,
+        min: min,
+        likedId: [],
+        comments: []);
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("q")
+        .doc(qe.id)
+        .set(qe.toMap());
+  }
+
+  Future deleteQ({
+    required String subjectName,
+    required String doctorName,
+    required String lectureName,
+    required String qId,
+  }) async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("q")
+        .doc(qId)
+        .delete();
+  }
+
+  List<QModel> q = [];
+
+  Future getQ(
+      {required String subjectName,
+      required String doctorName,
+      required String lectureName,
+      required BuildContext context}) async {
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("q")
+        .orderBy("min", descending: true)
+        .get()
+        .then((value) {
+      q = List.generate(value.docs.length,
+          (index) => QModel.fromJson(value.docs[index].data(), context));
+      emit(GetQ());
+    });
+  }
+
+  Future addCommentQ({
+    required String subjectName,
+    required String doctorName,
+    required String lectureName,
+    required BuildContext context,
+    required CommentModel comment,
+    required QModel q,
+  }) async {
+    List<CommentModel> c = q.comments;
+    c.add(comment);
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("q")
+        .doc(q.id)
+        .update({
+      "comments": List<Map>.generate(c.length, (index) => c[index].map())
+    }).then((value) => getQ(
+            subjectName: subjectName,
+            doctorName: doctorName,
+            lectureName: lectureName,
+            context: context));
+  }
+
+  Future addLikeQ({
+    required String subjectName,
+    required String doctorName,
+    required String lectureName,
+    required BuildContext context,
+    required QModel q,
+  }) async {
+    List c = q.likedId;
+    if (c.contains(user!.token)) {
+      c.remove(user!.token);
+    } else {
+      c.add(user!.token);
+    }
+    FirebaseFirestore.instance
+        .collection(user!.field)
+        .doc(user?.university)
+        .collection("teams")
+        .doc(user?.team)
+        .collection(home.term)
+        .doc(subjectName)
+        .collection("doctor")
+        .doc(doctorName)
+        .collection("lecture")
+        .doc(lectureName)
+        .collection("q")
+        .doc(q.id)
+        .update({"likedId": c}).then((value) => getQ(
+            subjectName: subjectName,
+            doctorName: doctorName,
+            lectureName: lectureName,
+            context: context));
+  }
+
+  Future downloadVideo(String url, context) async {
+    isLoading = true;
+    emit(GetCollage());
+    var ytExplode = YoutubeExplode();
+    var video = await ytExplode.videos.get(url);
+
+    var manifest = await ytExplode.videos.streamsClient.getManifest(video.url);
+
+    var streamInfo = manifest.audioOnly.first;
+    var videoStream = manifest.video.first;
+
+    var audioStream = ytExplode.videos.streamsClient.get(streamInfo);
+    var stream = await ytExplode.videos.streamsClient.get(videoStream);
+
+    Directory directory = await getApplicationCacheDirectory();
+
+    File saveLocation = File("${directory.path}/${video.id.value}.mp4");
+
+    var fileStream = saveLocation.openWrite();
+
+    // Pipe all the content of the stream into the file.
+    await stream.pipe(fileStream);
+
+    // Close teh file.
+    await fileStream.flush();
+    await fileStream.close();
+    await CryptoHelper().encrypt(
+        inputPath: saveLocation.path,
+        key: "Youssefahmed116",
+        ivw: "Youssefahmed116",
+        outputPath: saveLocation.path.replaceFirst(".mp4", ".aes"));
+    //  Map map=json.decode(SharedPreference.getDate(key: "listVideo"));
+    // print(map);
+
+    isLoading = false;
+    emit(GetCollage());
+
+    MotionToast.success(description: Text("تم التحميل بنجاح")).show(context);
+
+    // Implement file saving logic here
+  }
+
+  Future<int> deVideo(url, BuildContext context, map) async {
+    Directory directory = await getApplicationCacheDirectory();
+
+    File saveLocation = File("${directory.path}/$url.aes");
+    if (await File(saveLocation.path.replaceFirst(".aes", ".mp4")).exists()) {
+      print("fileIsHere");
+    } else {
+      print("ur good dev");
+    }
+    await CryptoHelper().decrypt(
+        inputPath: saveLocation.path,
+        key: "Youssefahmed116",
+        ivw: "Youssefahmed116",
+        outputPath: saveLocation.path.replaceFirst(".aes", ".mp4"));
+    Navigator.pop(context);
+    navigatorWid(
+        page: VideoOffline(
+          map: map,
+        ),
+        returnPage: true,
+        context: context);
+
+    return 1;
+  }
+
+  void save(videoId, subjectName, lectureName) {
+    var box = Hive.box('my videos');
+
+    box.put(box.length,
+        {"videoId": videoId, "title": subjectName, "lectureName": lectureName});
+  }
+
+  List myVideos = [];
+
+  void getBox() {
+    var box = Hive.box('my videos');
+    for (var i = 0; i < box.length; i++) {
+      print(i);
+      myVideos.add(box.getAt(i));
+    }
+  }
+
+  void getmoneyData() {
+    FirebaseFirestore.instance
+        .collection("Users")
+        .where("subscription", isNull: false)
+        .get()
+        .then((value) async {
+      List<UserModel> user = [];
+      user = List.generate(value.docs.length,
+          (index) => UserModel.fromJson(value.docs[index].data()));
+      var excel = Excel.createExcel();
+      final Sheet sheet = excel[excel.getDefaultSheet()!];
+      for (var row = 0; row < user.length; row++) {
+        sheet
+            .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
+            .value = TextCellValue(user[row].token);
+
+        sheet
+            .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
+            .value = TextCellValue(user[row].subscription!.name);
+      }
+      var fileBytes = excel.save();
+
+      Directory? directory = await getDownloadsDirectory();
+
+      File saveLocation = File("${directory!.path}/yoyo.xlsx");
+      await saveLocation.create();
+      await saveLocation.writeAsBytes(fileBytes!);
+      print("done");
     });
   }
 }
