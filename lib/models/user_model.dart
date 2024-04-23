@@ -18,6 +18,7 @@ class UserModel {
   final bool eg;
   final SubModel? subscription;
   final List subscriptionRev;
+  final List devicesInfo;
 
   UserModel(
       {required this.name,
@@ -31,6 +32,7 @@ class UserModel {
       required this.field,
       required this.typeStudy,
       this.subscriptionRev = const [],
+      this.devicesInfo = const [],
       this.subscription,
       required this.token,
       required this.university,
@@ -46,6 +48,7 @@ class UserModel {
       field: json["field"],
       token: json["token"],
       tokenDevice: json["tokenDevice"],
+      devicesInfo: json["devicesInfo"] ?? [],
       university: json["university"],
       subscriptionRev: json["subscriptionRev"] ?? [],
       subscription: json["subscription"] != null
